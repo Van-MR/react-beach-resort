@@ -12,7 +12,7 @@ const RoomsList = ({rooms}) => {
 
    return (
      <section className="roomslist">
-        <div className="roomlist-center">
+        <div className="roomslist-center">
             {rooms.map(room => {
               return <Room key={room.id} room={room} />
             })}
