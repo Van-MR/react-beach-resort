@@ -24,11 +24,16 @@ export default class RoomProvider extends React.Component {
      let rooms = this.formateData(items)
      let featuredRooms = rooms.filter(room => room.featured === true)
 
+     let maxPrice = Math.max(...rooms.map(room => room.price));
+     let maxSize = Math.max(...rooms.map(room => room.size));
      this.setState({
        rooms,
        featuredRooms,
        sortedRooms: rooms,
-       loading: false
+       loading: false,
+       price:maxPrice,
+       maxPrice,
+       maxSize
      })
   }
 
@@ -53,14 +58,18 @@ export default class RoomProvider extends React.Component {
      const target = e.target;
      const value = target.type === "checkbox" ? target.checked : target.value;
      const name = target.name
+     console.log(name,value);
 
-     this.setState({
-       [name] : value
-     },this.filterRooms)
+     this.setState(
+       {
+         [name] : value
+       },
+       this.filterRooms
+    );
   }
 
   filterRooms =() => {
-    //distruct
+    //distruct state variable
     let {
       rooms,
       type,
@@ -72,8 +81,9 @@ export default class RoomProvider extends React.Component {
       pets
     } = this.state;
 
+    //make a copy of rooms
     let tempRooms = [...rooms];
-    // transform values
+
     // get capacity
     capacity = parseInt(capacity);
     price = parseInt(price);
@@ -82,7 +92,24 @@ export default class RoomProvider extends React.Component {
       tempRooms = tempRooms.filter(room => room.type === type);
     }
 
-    
+    //filter capacity
+    if(capacity !== 1) {
+      tempRooms = tempRooms.filter(room => room.capacity >= capacity);
+    }
+
+    if(breakfast) {
+      tempRooms = tempRooms.filter(room => room.breakfast === true);
+    }
+
+    if(pets) {
+      tempRooms = tempRooms.filter(room => room.pets === true)
+    }
+
+    //filter by price
+    tempRooms = tempRooms.filter(room => room.price <= price)
+
+    //filter by size
+    tempRooms = tempRooms.filter( room => room.size >= minSize && room.size <= maxSize);
 
     this.setState({
       sortedRooms: tempRooms
